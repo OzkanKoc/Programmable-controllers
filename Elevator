@@ -1,0 +1,41 @@
+define LOADER_USED 1
+define HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+ADCON1=7
+TRISB=0
+TRISA=%001111
+destinationFloor var byte:destinationFloor=0  'cagırdıüımız kat
+OnFloor var byte:OnFloor=0  'bulunduğumuz kat
+k var byte    'ara işlemler
+
+porta.4=1 : porta.5=1
+k=%11111110 : portb=k
+label:
+    if porta.0=0 then  OnFloor=destinationFloor: destinationFloor=0 
+    if porta.1=0 then  OnFloor=destinationFloor: destinationFloor=2
+    if porta.2=0 then  OnFloor=destinationFloor: destinationFloor=4
+    if porta.3=0 then  OnFloor=destinationFloor: destinationFloor=6
+    
+    while OnFloor>destinationFloor
+        porta.4=1 : porta.5=0
+        k=~k
+        k=k>>1
+        k=~k
+        portb=k
+        OnFloor=OnFloor-1
+        pause 500
+    wend
+    
+    while OnFloor<destinationFloor
+        porta.4=0 : porta.5=1
+        k=~k
+        k=k<<1
+        k=~k
+        portb=k
+        OnFloor=OnFloor+1
+        pause 500
+    wend
+     porta.4=1:porta.5=1
+goto label
