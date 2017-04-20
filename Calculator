@@ -1,0 +1,111 @@
+define LOADER_USED 1
+define HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+TRISA=0
+ADCON1=7
+
+symbol d=portb.0
+symbol c=portb.1
+symbol b=portb.2
+symbol a=portb.3
+symbol x=portb.4
+symbol y=portb.5
+symbol z=portb.6
+symbol t=portb.7
+value2 var byte:value2=0
+value1 var byte
+operator var byte
+result var byte
+r var byte:r=0
+u var byte:u=0
+counter var byte:counter=0
+j var byte [10]
+f var byte:f=0
+
+j[0]=$3f 
+j[1]=6      
+j[2]=91      
+j[3]=79        
+j[4]=102         
+j[5]=%01101101    
+j[6]=%01111101   
+j[7]=7          
+j[8]=%01111111  
+j[9]=%01101111   
+
+label:
+porta=0
+    TRISB=%00001111
+    
+    x=1 : y=0 : z=0 : t=0
+      if a=1  then value2=1
+      if b=1 then value2=2
+      if c=1 then value2=3
+      if d=1 then value2="+": value1=value2
+      pause 5
+      
+     x=0 : y=1 : z=0 : t=0
+      if a=1  then value2=4
+      if b=1 then value2=5
+      if c=1 then value2=6
+      if d=1 then operator="-": value1=value2
+      pause 5
+      
+    x=0 : y=0 : z=1 : t=0
+      if a=1  then value2=7
+      if b=1 then value2=8
+      if c=1 then value2=9
+      if d=1 then operator="*":value1=value2
+      pause 5
+      
+    x=0 : y=0 : z=0 : t=1
+      if a=1  then value2=0
+      if b=1 then operator="c"
+      if c=1 then operator="="
+      if d=1 then operator="/": value1=value2
+      pause 5
+      
+      select  case operator
+      case "+"
+      result=value1+value2
+      case "-"
+      result=value1-value2
+      case "*"
+      result=value1*value2
+      case "/"
+      result=value1/value2
+      case "c"
+      portb=0:value2=0:value1=0: operator=0: result=0: counter=0: u=0: r=0:f=0
+      case "="
+      if result<10 then
+        value2=result
+      else
+      f=1
+         r=result dig 0
+         u=result dig 1
+         TRISB=0
+         while result<80
+            porta=1
+            portb=j[r]
+            pause 10
+            porta=2
+            portb=j[u]
+            pause 10
+            counter=counter+1
+        wend  
+      endif  
+end select
+
+    if f=0 then
+      porta=1
+      TRISB=0
+      portb=j[value2]
+      pause 5
+    endif 
+goto label
+   
+    
+      
+
