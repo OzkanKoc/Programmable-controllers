@@ -1,0 +1,63 @@
+define LOADER_USED 1
+define LCD_DREG PORTD   'LCD data portunun bağlandığı pic portu
+define LCD_DBIT 0       '4-bit bus için data bit(0yada4) başlangıç
+define LCD_RSREG PORTE  'LCD RS in bağlandığı pic portu
+define LCD_RSBIT 0      'RS in bağlandığı pic PortE nin bit numarası
+define LCD_EREG PORTE   'LCD E nin bağlandığı pic portu
+DEfine LCD_EBIT 2       'LCD E nin bağlandığı pic PortE nin bit numarası
+define LCD_BITS 8
+ADCON1=7
+TRISE=%000
+porte.1=0
+pause 100
+
+define HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h
+DEFINE HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+x var byte
+h var byte
+m var byte
+s var byte
+x=1
+h=3:m=12:s=5
+
+label:
+    lcdout $fe,$80,#(h dig 1)
+    lcdout $fe,$81,#(h dig 0)
+    lcdout $fe,$82,":"
+    lcdout $fe,$83,#(m dig 1)
+    lcdout $fe,$84,#(m dig 0) 
+    lcdout $fe,$85,":"
+    lcdout $fe,$86,#(s dig 1)
+    lcdout $fe,$87,#(s dig 0)
+    hserin 1000,update,[x]
+label2:
+    s=s+1
+    if s=60 then 
+        s=0
+        m=m+1
+        if m=60 then
+            m=0
+            h=h+1
+            if h=24 then h=0
+        endif
+    endif     
+goto label
+
+update:
+    if x!=" " then goto label2
+    lcdout $fe,1,"Saat giriniz.."
+    hserin[#h]
+    lcdout $fe,1,"Dakika giriniz.."
+    hserin[#m]
+    lcdout $fe,1,"Saniye giriniz.."
+    hserin[#s]
+    
+    if h>23 then  goto update 
+    if m>59 then  goto update
+    if s>59 then goto update
+
+    x=1
+    lcdout $fe,1
+    goto label 
