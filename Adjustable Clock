@@ -47,11 +47,11 @@ goto label
 
 update:
     if x!=" " then goto label2
-    lcdout $fe,1,"Saat giriniz.."
+    lcdout $fe,1,"Hour: "
     hserin[#h]
-    lcdout $fe,1,"Dakika giriniz.."
+    lcdout $fe,1,"Minute: "
     hserin[#m]
-    lcdout $fe,1,"Saniye giriniz.."
+    lcdout $fe,1,"Second: "
     hserin[#s]
     
     if h>23 then  goto update 
