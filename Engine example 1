@@ -1,0 +1,46 @@
+define LOADER_USED 1
+define HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+ADCON1=7
+TRISA=%000000:TRISB=0 
+
+i var byte
+x var byte
+
+portb=1
+pause 100
+
+label:
+  hserin[x]
+  if x="a" then
+    pulsout porta.2,100
+    pause 100 
+    portb=portb<<1
+    if portb=16 then portb=1
+  endif
+
+  if x="d" then   
+    pulsout porta.2,100
+    pause 100 
+    portb=portb>>1
+    if portb=0 then portb=8
+  endif
+
+  if x="w" then
+continue1:pulsout porta.2,100
+        pause 100 
+        portb=portb<<1
+        if portb=16 then portb=1
+        hserin 100,continue1,[x]
+  endif
+
+  if x="s" then
+continue2:pulsout porta.2,100
+        pause 100 
+        portb=portb>>1
+        if portb=0 then portb=8
+        hserin 100,continue2,[x]
+  endif
+goto label 
