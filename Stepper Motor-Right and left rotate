@@ -1,0 +1,34 @@
+define LOADER_USED 1
+define HSER_RCSTA 90h
+DEFINE HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+ADCON1=7
+TRISA=%010000:TRISB=0 
+i var byte
+lab:
+    if porta.4=1 then gosub sol
+    if porta.4=0 then gosub sag
+goto lab
+sol: 
+    portb=1
+    pause 100
+    pulsout porta.2,100
+    for i=0 to 2 step 1  
+        portb=portb<<1
+        pause 100
+        pulsout porta.2,100
+    next i
+return
+
+sag:
+    portb=%00001000
+    pause 100
+    pulsout porta.2,100
+    for i=0 to 2 step 1  
+        portb=portb>>1
+        pause 100
+        pulsout porta.2,100
+    next i
+return  
+     
