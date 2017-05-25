@@ -1,0 +1,58 @@
+define LOADER_USED 1              'ayarlanabilir bir kontrol mekanizmamız var.(c=30)
+define HSER_RCSTA 90h             'Okuduğu sıcaklık değeri 30'dan büyük ise 
+DEFINE HSER_TXSTA 24h             'porta.4 'e bağlı olan ledi yakar.
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+TRISA=%1100
+ADCON1=7
+portb=0
+x var byte [10]
+i var byte
+b var byte
+o var byte
+c var byte: c=30
+d var byte
+x[0]=$3f 
+x[1]=6      
+x[2]=91      
+x[3]=79        
+x[4]=102         
+x[5]=%01101101    
+x[6]=%01111101   
+x[7]=7          
+x[8]=%01111111  
+x[9]=%01101111
+ 
+label:
+    while porta.2=0
+        i=c
+        if porta.3=0 then 
+            c=c+1
+            pause 100
+        endif
+        gosub write1
+    wend
+    gosub read1
+    gosub write1
+    goto label
+read1:
+    porta.0=0
+    TRISB=%11111111
+    if i>c then porta.4=0
+    if i<c then porta.4=1
+    i=portb
+    return
+write1:
+    porta.0=1
+    TRISB=%00000000
+    b=i dig 0
+    o=i dig 1  
+    porta.1=1
+    portb=x[b]
+    pause 10
+    porta.1=0
+    portb=x[o]
+    pause 10
+    return
+
+    
