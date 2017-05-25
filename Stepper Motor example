@@ -1,8 +1,8 @@
-define LOADER_USED 1
-define HSER_RCSTA 90h
-DEFINE HSER_TXSTA 24h
-define HSER_BAUD 9600
-DEFINE HSER_CLROERR 1
+define LOADER_USED 1                      'kullanıcıdan aldığı komut kümesi-> (a,d,s,w)
+define HSER_RCSTA 90h                     'a tuşuna basıldığında step motor 1 adım sola,
+DEFINE HSER_TXSTA 24h                     'd tuşuna basuldığında ise 1 adım sağa dönüş yapar.
+define HSER_BAUD 9600                     'w tuşuna basılı tutulduğu sürece step motor sola,
+DEFINE HSER_CLROERR 1                     's tuşuna basıldığı sürece step motor sağa dönüş gerçekleştirir.
 ADCON1=7
 TRISA=%000000:TRISB=0 
 
