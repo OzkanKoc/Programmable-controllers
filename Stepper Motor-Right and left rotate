@@ -7,10 +7,10 @@ ADCON1=7
 TRISA=%010000:TRISB=0 
 i var byte
 lab:
-    if porta.4=1 then gosub sol
-    if porta.4=0 then gosub sag
+    if porta.4=1 then gosub left
+    if porta.4=0 then gosub right
 goto lab
-sol: 
+left: 
     portb=1
     pause 100
     pulsout porta.2,100
@@ -21,7 +21,7 @@ sol:
     next i
 return
 
-sag:
+right:
     portb=%00001000
     pause 100
     pulsout porta.2,100
