@@ -1,0 +1,73 @@
+define LOADER_USED 1
+define LCD_DREG PORTD   'LCD data portunun bağlandığı pic portu
+define LCD_DBIT 0       '4-bit bus için data bit(0yada4) başlangıç
+define LCD_RSREG PORTE  'LCD RS in bağlandığı pic portu
+define LCD_RSBIT 0      'RS in bağlandığı pic PortE nin bit numarası
+define LCD_EREG PORTE   'LCD E nin bağlandığı pic portu
+DEfine LCD_EBIT 2       'LCD E nin bağlandığı pic PortE nin bit numarası
+define LCD_BITS 8
+ADCON1=7
+TRISA=0
+TRISE=%000
+porte.1=0
+pause 100
+
+portb=0
+x var byte [10]
+i var byte
+b var byte
+o var byte
+c var byte: c=30
+d var byte
+
+x[0]=$3f 
+x[1]=6      
+x[2]=91      
+x[3]=79        
+x[4]=102         
+x[5]=%01101101    
+x[6]=%01111101   
+x[7]=7          
+x[8]=%01111111  
+x[9]=%01101111  
+
+lcdout $fe,$40,4,21,14,27,10,14,4,4 'ampul yanık
+lcdout $fe,$48,7,5,7,0,0,0,0,0 'derece
+lcdout $fe,$50,0,0,14,10,10,14,4,4 'ampul sönük
+
+label:
+    while porta.2=0
+        i=c
+        if porta.3=0 then 
+            c=c+1
+            pause 100
+        endif
+        gosub write1
+    wend
+    gosub read1
+    gosub write1
+    goto label
+read1:
+    porta.0=0
+    TRISB=%11111111
+    if i>c then 
+        porta.4=0
+        lcdout $fe,$C0,"Termostat:",#c,1,"C ",0
+    endif
+    if i<c then porta.4=1
+    i=portb
+    return
+write1:
+    porta.0=1
+    TRISB=%00000000
+    b=i dig 0
+    o=i dig 1  
+    porta.1=1
+    portb=x[b]
+    pause 10
+    porta.1=0
+    portb=x[o]
+    pause 10
+    lcdout $fe,1,"Termometre:",#i,1,"C"
+    if i<c then lcdout $fe,$C0,"Termostat:",#c,1,"C",2
+    return     
