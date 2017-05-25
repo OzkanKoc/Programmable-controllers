@@ -1,0 +1,65 @@
+define LOADER_USED 1              'portb.4'de bağlı olan butona bastığımızda sayımız artıyor
+define HSER_RCSTA 90h             'portb.6'ya bağlı olan butona bastığımızda sayımız azalıyor.
+DEFINE HSER_TXSTA 24h             'portb.5'e bastığımızda ise sayımızı kaç ayarlamışsak 
+define HSER_BAUD 9600             'step motorumuz o kadar tur gerçekleştiriyor.
+DEFINE HSER_CLROERR 1             'portb.7'ye bağlı olan buyona bastığımızda ise 
+ADCON1=7                          'motor dönüş halinde ise olduğu yerde duruyor.
+TRISA=%001000                     '2. defa bastığımızda ise kaldığı yerden dönmesine devam ediyor.
+TRISB=0                           'Modül sıkıntısından dolayı bu kodu deneme şansımız olmadı. Büyük ihtimalle çalışır durumda.
+
+x var byte [10]
+i var byte:i=0
+z var byte:z=0
+t var byte:t=0
+j var byte:j=0
+
+x[0]=$3f 
+x[1]=6      
+x[2]=91      
+x[3]=79        
+x[4]=102         
+x[5]=%01101101    
+x[6]=%01111101   
+x[7]=7          
+x[8]=%01111111  
+x[9]=%01101111  
+
+porta.0=0
+portb=1
+
+label:
+    pause 100
+    portb.4=1:portb.6=0:portb.5=0:portb.7=0
+    if porta.3=1 then
+        porta.1=1
+        i=i+1
+        z=0
+    endif
+    pause 100
+    
+    portb.4=0:portb.6=1:portb.5=0:portb.7=0    
+    if porta.3=1 then
+        porta.1=1
+        i=i-1
+        if i<0 then i=0
+        z=0
+    endif
+    pause 100
+    
+    portb.4=0:portb.6=0:portb.5=1:portb.7=0
+    if porta.3=1 then
+        pulsout porta.2,100
+        portb=1
+continue:
+        while j<i and t=0
+            portb=portb<<1
+            if portb>256 then portb=11
+            z=z+1
+            portb.4=0:portb.6=0:portb.5=0:portb.7=1
+            if porta.3=1 then t=1
+            if z=49 then j=j+1:z=0
+        wend
+    endif   
+    portb=x[i]
+    if portb.7=1 and porta.3=1 then t=0: goto continue
+goto label
