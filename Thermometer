@@ -1,0 +1,45 @@
+define LOADER_USED 1                'b portundan okuduğu sıcaklık değerini
+define HSER_RCSTA 90h               'displayde gösterir.
+DEFINE HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+TRISA=0
+ADCON1=7
+portb=0
+x var byte [10]
+i var byte
+b var byte
+o var byte
+
+x[0]=$3f 
+x[1]=6      
+x[2]=91      
+x[3]=79        
+x[4]=102         
+x[5]=%01101101    
+x[6]=%01111101   
+x[7]=7          
+x[8]=%01111111  
+x[9]=%01101111  
+
+label:
+    gosub read 
+    gosub write
+    goto label
+read:
+    porta.0=0
+    TRISB=%11111111
+    i=portb
+    return
+write:
+    porta.0=1
+    TRISB=%00000000
+    b=i dig 0
+    o=i dig 1  
+    porta.1=1
+    portb=x[b]
+    pause 10
+    porta.1=0
+    portb=x[o]
+    pause 10
+    return
